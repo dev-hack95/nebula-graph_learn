@@ -124,6 +124,23 @@ classDiagram
     }
 ```
 
+6) **Tags**
+  
+  * **Description**: Labels for categorizing vertices (similar to labels in other graph 
+    databases). Vertices with the same tag share the same property keys.
+
+  * **Key Features**
+
+    * Each tag defines a set of properties (keys).
+    * Properties must be consistent for all vertices using the tag.
+
+```mermaid
+classDiagram
+    class Tag {
+        +name: string
+        +properties: map<string, string>
+    }
+```
 
 ### Relationship Diagram
 
@@ -148,3 +165,80 @@ graph TD
 
 ````
 
+## Nebula Graph Directed Property graph
+
+  * NebulaGraph stores data in directed property graphs. A directed property graph is a
+    graph database structure where verticrs and directed edges are connected and both 
+    can have assocaited properties.
+
+  * The graph is represnted as G = <V, E, PV, PE>
+
+    * **V** : A set of vertices (nodes).
+    * **E** : A set of directed edges (relationships or connections).
+    * **PV** : Property definitions for vertices.
+    * **PE** : Property definitions for edges.
+
+
+---
+
+#### Vertex
+
+  * **Definition**
+    
+    * A vertex represents an entity in the graph (e.g., a person, an object).
+    
+    * Each vertex has a unique identifier called VID (Vertex ID).
+
+  * **Key Characteristics**
+    
+    1) **VID** : Must be unique within a graph space. It can be either int64 or fixed_string(N).
+    
+    2) **Tags** : Vertices can belong to one or more tags. Tags are used to categorize vertices 
+       and define their property schema.
+
+      * Example: In the basketball player dataset, player and team are vertex tags.
+
+    3) Properties: Key-value pairs associated with a vertex. Property keys are defined by tags.
+       
+      * **Example** : For player tag: name (string) and age (int).
+
+      * For team tag: name (string).
+
+**Example**
+
+|Vertex | Tag	Property Keys |	Description
+|-------|-------------------|----------------------------------
+|player	| name, age         | Represents players in a team.
+|team	  | name	            | Represents teams with their names.
+
+---
+
+###  Edge (Edge)
+  * **Definition**
+  
+    * An edge represents a directed relationship between two vertices.
+
+    * It is uniquely identified by <source vertex, edge type, rank, destination vertex>.
+
+  * **Key Characteristics**
+    
+    1) **Directed** : Edges are directed (i.e., they point from one vertex to another).
+       
+      * **Example** : The edge follow points from a follower to a followee.
+
+    2) **Edge Type** : Each edge has one and only one edge type, which defines its property schema.
+      
+      * **Example** : In the basketball player dataset, serve and follow are edge types.
+    
+    3) **Rank** : An immutable 64-bit signed integer used to order edges with the same edge type and source-destination pair.
+      
+      * **Default** : 0. Higher rank values appear first.
+      
+      * **Example** : The follow edge type includes a property degree (int) to represent follower ratings.
+
+**Example**
+
+|Edge Type	| Source Vertex	| Destination Vertex	| Properties	                |Description
+------------|---------------|---------------------|-----------------------------|------------------
+|serve	    | Player	      | Team	              | start_year, end_year (int)	| Represents a player serving a team.
+|follow	    | Player	      | Player	            | degree (int)	              | Represents a player following another player on Twitter.
