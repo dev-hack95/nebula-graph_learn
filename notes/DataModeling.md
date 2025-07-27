@@ -213,7 +213,7 @@ graph TD
 
 ---
 
-###  Edge (Edge)
+####  Edge
   * **Definition**
   
     * An edge represents a directed relationship between two vertices.
@@ -242,3 +242,212 @@ graph TD
 ------------|---------------|---------------------|-----------------------------|------------------
 |serve	    | Player	      | Team	              | start_year, end_year (int)	| Represents a player serving a team.
 |follow	    | Player	      | Player	            | degree (int)	              | Represents a player following another player on Twitter.
+
+---
+
+## Graph Theory: Path Types 
+
+### Overview
+  * In graph theory, a **path** is a finite or infinite sequence of edges which joins a sequence of vertices. Paths are fundamental concepts 
+    of graph theory and can be categorized into three main types: **Walk**, **Trail**, and **Path**.
+
+
+1) **Walk**
+  
+  * **Definition**
+    
+    * **walk** is a finite or infinite sequence of edges where:
+      
+      - Both vertices and edges can be **repeatedly visited** during graph traversal
+      
+      - No restrictions on repetition
+
+### Key Characteristics
+- ✅ Vertices can be repeated
+- ✅ Edges can be repeated
+- ✅ Can be infinite in length
+- 🔄 Allows cycles and loops
+
+### Example Paths
+Given a graph with cycle C-D-E:
+- `A→B→C→D→E`
+- `A→B→C→D→E→C` (revisiting vertex C)
+- `A→B→C→D→E→C→D` (revisiting vertices and edges)
+
+### Usage in Graph Databases
+- **GO statements** use walk semantics
+
+```mermaid
+graph LR
+    A((A)) --> B((B))
+    B --> C((C))
+    C --> D((D))
+    D --> E((E))
+    E --> C
+    
+    style A fill:#e1f5fe
+    style B fill:#e1f5fe
+    style C fill:#fff3e0
+    style D fill:#fff3e0
+    style E fill:#fff3e0
+```
+
+---
+
+## 2. Trail
+
+* **Definition**
+  * A **trail** is a finite sequence of edges where:
+    
+    - Only **vertices** can be repeatedly visited
+    
+    - **Edges** cannot be repeated
+
+### Key Characteristics
+- ✅ Vertices can be repeated
+- ❌ Edges cannot be repeated
+- ⚠️ Always finite in length
+- 📏 Limited by number of unique edges
+
+### Example
+In a graph with 5 edges, the longest trail would be: `A→B→C→D→E→C`
+- Vertex C is visited twice
+- No edge is traversed more than once
+
+### Usage in Graph Databases
+- **MATCH statements** use trail semantics
+- **FIND PATH statements** use trail semantics  
+- **GET SUBGRAPH statements** use trail semantics
+
+### Special Cases of Trail
+
+#### 2.1 Cycle
+**Definition**: A closed trail where only terminal vertices can be repeated
+
+**Characteristics**:
+- 🔄 Forms a closed loop
+- ✅ Start and end vertices are the same
+- ❌ No other vertex repetition allowed
+- ❌ No edge repetition
+
+**Example**: `A→B→C→A` or `C→D→E→C`
+
+```mermaid
+graph LR
+    A((A)) --> B((B))
+    B --> C((C))
+    C --> A
+    
+    D((D)) --> E((E))
+    E --> F((F))
+    F --> D
+    
+    style A fill:#ffebee
+    style B fill:#ffebee
+    style C fill:#ffebee
+    style D fill:#e8f5e8
+    style E fill:#e8f5e8
+    style F fill:#e8f5e8
+```
+
+#### 2.2 Circuit
+**Definition**: A closed trail where terminal vertices and intermediate vertices can be repeated
+
+**Characteristics**:
+- 🔄 Forms a closed loop
+- ✅ Start and end vertices are the same
+- ✅ Intermediate vertices can be repeated
+- ❌ No edge repetition
+
+**Example**: `A→B→C→D→E→C→A`
+- Starts and ends at A
+- Vertex C is visited twice
+- No edge is used twice
+
+```mermaid
+graph LR
+    A((A)) --> B((B))
+    B --> C((C))
+    C --> D((D))
+    D --> E((E))
+    E --> C
+    C --> A
+    
+    style A fill:#f3e5f5
+    style C fill:#fff9c4
+```
+
+---
+
+## 3. Path (Simple Path)
+
+* **Definition**
+  
+  * A **path** (also called simple path) is a finite sequence of edges where:
+    
+    - **Neither vertices nor edges** can be repeatedly visited
+    
+    - Most restrictive type of path
+
+### Key Characteristics
+- ❌ Vertices cannot be repeated
+- ❌ Edges cannot be repeated
+- ⚠️ Always finite in length
+- 📏 Limited by number of unique vertices - 1
+
+### Example
+In a graph with 5 vertices, the longest simple path would be: `A→B→C→D→E`
+- Each vertex visited exactly once
+- Each edge traversed exactly once
+
+```mermaid
+graph LR
+    A((A)) --> B((B))
+    B --> C((C))
+    C --> D((D))
+    D --> E((E))
+    
+    style A fill:#e1f5fe
+    style B fill:#e8f5e8
+    style C fill:#fff3e0
+    style D fill:#ffebee
+    style E fill:#f3e5f5
+```
+
+---
+
+## Quick Comparison Table
+
+| Path Type | Vertex Repetition | Edge Repetition | Length | Example |
+|-----------|------------------|-----------------|---------|---------|
+| **Walk** | ✅ Allowed | ✅ Allowed | Infinite possible | `A→B→C→D→E→C→D` |
+| **Trail** | ✅ Allowed | ❌ Not allowed | Finite | `A→B→C→D→E→C` |
+| **Path** | ❌ Not allowed | ❌ Not allowed | Finite | `A→B→C→D→E` |
+
+### Trail Subtypes
+| Subtype | Description | Vertex Repetition | Edge Repetition |
+|---------|-------------|------------------|-----------------|
+| **Cycle** | Closed trail, only terminals repeat | ✅ Terminal only | ❌ Not allowed |
+| **Circuit** | Closed trail, any vertex can repeat | ✅ Allowed | ❌ Not allowed |
+
+---
+
+## Practical Applications
+
+### Graph Database Queries
+- **Walk-based**: `GO` statements for exploring all possible paths including cycles
+- **Trail-based**: `MATCH`, `FIND PATH`, `GET SUBGRAPH` for finding paths without edge repetition
+- **Path-based**: Finding shortest or simple paths between vertices
+
+### Real-world Examples
+- **Walk**: Web crawling (can revisit pages and links)
+- **Trail**: Seven Bridges of Königsberg problem
+- **Path**: Finding shortest route between cities (each city visited once)
+
+---
+
+## Memory Tips
+
+1. **Walk**: Most permissive - "walk anywhere, anytime"
+2. **Trail**: Middle ground - "leave a trail, don't repeat steps"
+3. **Path**: Most restrictive - "simple and direct path"
